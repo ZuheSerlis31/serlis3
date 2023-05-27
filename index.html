@@ -1,488 +1,279 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-
   <title>Selector de Perfiles</title>
-
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
   <style>
-
     body {
-
       background-color: #141414;
-
       color: #fff;
-
     }
 
     .container {
-
       max-width: 800px;
-
       margin: 0 auto;
-
       padding: 20px;
-
     }
 
     h1, h2, h3 {
-
       text-align: center;
-
       margin-bottom: 20px;
-
     }
 
     #profile-list {
-
       display: flex;
-
       flex-wrap: wrap;
-
       justify-content: center;
-
       margin-bottom: 30px;
-
     }
 
     .profile-card {
-
       width: 200px;
-
       margin: 10px;
-
       text-align: center;
-
       position: relative;
-
     }
 
     .profile-image {
-
       width: 160px;
-
       height: 160px;
-
       object-fit: cover;
-
       border-radius: 50%;
-
       margin-bottom: 10px;
-
       cursor: pointer;
-
     }
 
     .profile-name {
-
       font-size: 18px;
-
       font-weight: bold;
-
       margin-bottom: 10px;
-
     }
 
     .delete-button {
-
-      background-color: #e50914;
-
+      background-color: blue;
       border: none;
-
       color: #fff;
-
       padding: 5px 10px;
-
       font-size: 14px;
-
       cursor: pointer;
-
       transition: background-color 0.3s;
-
+      border-radius: 20px;
     }
 
     .delete-button:hover {
-
-      background-color: #b2070f;
-
+      background-color: blue;
     }
 
     .delete-button::before,
-
     .delete-button::after {
-
       content: "";
-
       position: absolute;
-
       width: 0;
-
       height: 2px;
-
       background-color: #e50914;
-
       transition: width 0.3s;
-
     }
 
     .delete-button::before {
-
       top: 50%;
-
       left: 50%;
-
       transform: translate(-50%, -50%);
-
     }
 
     .delete-button::after {
-
       bottom: -4px;
-
       left: 0;
-
     }
 
     .delete-button:hover::before,
-
     .delete-button:hover::after {
-
       width: 100%;
-
     }
 
     .add-profile-form .col-md-4 {
-
       margin-bottom: 15px;
-
     }
 
     .add-button {
-
-      background-color: #e50914;
-
+      background-color: blue;
       border: none;
-
       color: #fff;
-
       padding: 10px 20px;
-
       font-size: 16px;
-
       cursor: pointer;
-
       transition: background-color 0.3s;
-
+      border-radius: 20px;
     }
 
     .add-button:hover {
-
-      background-color: #b2070f;
-
+      background-color: blue;
     }
 
     @keyframes fadeIn {
-
       0% {
-
         opacity: 0;
-
       }
-
       100% {
-
         opacity: 1;
-
       }
-
     }
 
     @keyframes fadeOut {
-
       0% {
-
         opacity: 1;
-
       }
-
       100% {
-
         opacity: 0;
-
       }
-
     }
 
     .fade-message {
-
       position: absolute;
-
       top: 50%;
-
       left: 50%;
-
       transform: translate(-50%, -50%);
-
       padding: 10px 20px;
-
       background-color: #e50914;
-
       color: #fff;
-
       font-size: 16px;
-
       border-radius: 4px;
-
       animation: fadeIn 0.5s ease-in-out;
-
       animation-fill-mode: both;
-
       display: none;
-
     }
 
     .fade-message.fade-in {
-
       display: block;
-
       animation: fadeOut 0.5s ease-in-out 2s forwards;
-
     }
 
     @media (max-width: 576px) {
-
       .profile-card {
-
         width: 100%;
-
       }
-
     }
-
   </style>
-
 </head>
-
 <body>
-
   <div class="container">
-
-    <h1>Selector de Perfiles</h1>
-
+    <h1>Selector de perfiles<h1>
     <div id="profile-list">
-
       <!-- Aquí se mostrarán los perfiles existentes -->
-
     </div>
-
     <hr>
-
     <h2>Agregar Perfil</h2>
-
     <div id="add-profile-form" class="add-profile-form">
-
       <div class="row">
-
         <div class="col-md-4">
-
           <label for="name">Nombre:</label>
-
           <input type="text" id="name" class="form-control" required>
-
         </div>
-
         <div class="col-md-4">
-
           <label for="image-url">URL de la imagen:</label>
-
           <input type="url" id="image-url" class="form-control" required>
-
         </div>
-
         <div class="col-md-4">
-
           <label for="pin">PIN de 4 dígitos:</label>
-
           <input type="password" id="pin" class="form-control" pattern="\d{4}" required>
-
         </div>
-
         <div class="col-md-12 mt-3">
-
           <button type="button" id="add-button" class="add-button">Agregar</button>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
   <script>
-
     // Obtener los perfiles guardados en localStorage
-
     let profiles = JSON.parse(localStorage.getItem("profiles")) || [];
 
     // Función para guardar los perfiles en localStorage
-
     function saveProfiles() {
-
       localStorage.setItem("profiles", JSON.stringify(profiles));
-
     }
 
     // Función para mostrar los perfiles existentes
-
     function showProfiles() {
-
       const profileList = $("#profile-list");
-
       profileList.empty();
 
       profiles.forEach((profile) => {
-
         const profileCard = $("<div>").addClass("profile-card");
-
         const image = $("<img>").addClass("profile-image").attr("src", profile.imageUrl);
-
         const name = $("<h3>").addClass("profile-name").text(profile.name);
-
-        const deleteButton = $("<button>").addClass("delete-button").text("Eliminar");
-
+        const deleteButton = $("<button>").addClass("delete-button btn btn-primary").text("Eliminar");
         deleteButton.on("click", () => {
-
           const pin = prompt("Introduce el PIN de 4 dígitos para eliminar el perfil:");
-
           if (pin === profile.pin) {
-
             deleteProfile(profile.id);
-
             showFadeMessage("Perfil eliminado", "fade-out");
-
           } else {
-
             showFadeMessage("PIN incorrecto. No se puede eliminar el perfil.", "fade-out");
-
           }
-
         });
 
         profileCard.append(image, name, deleteButton);
-
         profileList.append(profileCard);
 
         // Agregar evento de clic a la imagen para redireccionar
-
         image.on("click", () => {
-
-          window.location.href = "pagina-de-destino.html"; // Reemplaza "pagina-de-destino.html" con la URL de la página de destino
-
+          const pin = prompt("Introduce el PIN de 4 dígitos para acceder:");
+          if (pin === profile.pin) {
+            window.location.href = "https://zuhes-app-n02x.glideapp.io"; // Cambiar con la URL de destino
+          } else {
+            showFadeMessage("PIN incorrecto. No se puede acceder al perfil.", "fade-out");
+          }
         });
-
       });
-
-    }
-
-    // Función para agregar un nuevo perfil
-
-    function addProfile(name, imageUrl, pin) {
-
-      if (profiles.length >= 5) {
-
-        showFadeMessage("No se pueden agregar más de 5 perfiles.", "fade-in");
-
-        return;
-
-      }
-
-      const newProfile = {
-
-        id: Date.now(),
-
-        name: name,
-
-        imageUrl: imageUrl,
-
-        pin: pin
-
-      };
-
-      profiles.push(newProfile);
-
-      saveProfiles();
-
-      showProfiles();
-
-      showFadeMessage("Perfil agregado", "fade-in");
-
     }
 
     // Función para eliminar un perfil
-
     function deleteProfile(profileId) {
-
       profiles = profiles.filter((profile) => profile.id !== profileId);
-
       saveProfiles();
-
       showProfiles();
-
     }
 
-    // Función para mostrar un mensaje animado
-
-    function showFadeMessage(message, className) {
-
-      const fadeMessage = $("<div>").addClass("fade-message " + className).text(message);
-
-      $("body").append(fadeMessage);
-
+    // Función para mostrar un mensaje con animación de desvanecimiento
+    function showFadeMessage(message, animationClass) {
+      const fadeMessage = $("<div>").addClass(`fade-message ${animationClass}`).text(message);
+      $(".container").append(fadeMessage);
       setTimeout(() => {
-
         fadeMessage.remove();
-
       }, 3000);
-
     }
 
-    // Evento al hacer clic en el botón "Agregar"
+    // Agregar evento de clic al botón de agregar
+    $("#add-button").on("click", () => {
+      const name = $("#name").val();
+      const imageUrl = $("#image-url").val();
+      const pin = $("#pin").val();
 
-    const addButton = $("#add-button");
-
-    addButton.on("click", () => {
-
-      const nameInput = $("#name");
-
-      const imageUrlInput = $("#image-url");
-
-      const pinInput = $("#pin");
-
-      addProfile(nameInput.val(), imageUrlInput.val(), pinInput.val());
-
-      nameInput.val("");
-
-      imageUrlInput.val("");
-
-      pinInput.val("");
-
+      if (name && imageUrl && pin && profiles.length < 5) {
+        const newProfile = {
+          id: Date.now(),
+          name,
+          imageUrl,
+          pin
+        };
+        profiles.push(newProfile);
+        saveProfiles();
+        showProfiles();
+        $("#name").val("");
+        $("#image-url").val("");
+        $("#pin").val("");
+        showFadeMessage("Perfil agregado", "fade-in");
+      } else if (profiles.length >= 5) {
+        showFadeMessage("No se pueden agregar más perfiles. Límite máximo alcanzado.", "fade-out");
+      } else {
+        showFadeMessage("Por favor, completa todos los campos.", "fade-out");
+      }
     });
 
-    // Mostrar los perfiles existentes al cargar la página
-
+    // Mostrar los perfiles al cargar la página
     showProfiles();
-
   </script>
-
 </body>
-
 </html>
-
